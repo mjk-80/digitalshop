@@ -1,9 +1,23 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import ProductList from '../components/ProductList';
 import { getProducts } from '../services';
+import { ProductsWithImages } from '@/types';
 
-async function ProductListView() {
-  const products = await getProducts();
+function ProductListView() {
+  const [products, setProducts] = useState<ProductsWithImages[]>([]);
+
+  const getProductData = async () => {
+    const result = await getProducts();
+    setProducts(result);
+  };
+
+  useEffect(() => {
+    getProductData();
+  }, []);
+
+  // const products = getProducts();
   return (
     <div>
       <ProductList products={products} />
