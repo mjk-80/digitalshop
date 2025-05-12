@@ -3,6 +3,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { promises as fs } from 'fs';
 import { prisma } from '@/lib/prisma';
+import { error } from 'console';
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
@@ -54,5 +55,93 @@ export async function POST(req: NextRequest) {
       message: 'File Uploaded Successfully',
       data: updatedProduct?.images,
     });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const productId = searchParams.get('productId');
+
+  if (!productId) {
+    return NextResponse.json(
+      {
+        error: 'Missing product id',
+      },
+      {
+        status: 400,
+      },
+    );
+  } else {
+    const images = await prisma.image.findMany({ where: { productId } });
+    return NextResponse.json({
+      images,
+    });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const imageId = searchParams.get('imageId');
+
+  if (!imageId) {
+    return NextResponse.json(
+      {
+        error: 'Missing image id',
+      },
+      {
+        status: 400,
+      },
+    );
+  } else {
+    const image = await prisma.image.findUnique({
+      where: {
+        id: imageId,
+      },
+      include: { Product: true },
+    });
+
+    if (!image) {
+      return NextResponse.json(
+        {
+          error: 'invalid image id',
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    const imagePath = path.join(process.cwd(), 'public', image.image);
+
+    //Remove image file from file system
+    try {
+      await fs.unlink(imagePath);
+      console.log(`Deleted file: ${imagePath}`);
+    } catch (fileError) {
+      console.error(`Error deleting file ${imagePath}: `, fileError);
+      return NextResponse.json(
+        {
+          error: 'file deletion failed',
+        },
+        {
+          status: 500,
+        },
+      );
+    }
+
+    //Remove image from database
+    await prisma.image.delete({
+      where: { id: imageId },
+    });
+
+    return NextResponse.json(
+      {
+        message: 'image deleted Successfully',
+        data: image.productId,
+      },
+      {
+        status: 200,
+      },
+    );
   }
 }

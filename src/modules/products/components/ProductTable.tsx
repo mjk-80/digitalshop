@@ -51,12 +51,15 @@ const ProductTable = (props: {
               <TableCell className="text-center">{product.price}</TableCell>
               <TableCell className="text-center">{product.quantity}</TableCell>
               <TableCell className="text-center">
-                <Image
-                  src={product.images[0]?.image || '/assets/noImage.jpg'}
-                  alt={product.name}
-                  width={50}
-                  height={50}
-                />
+                <div className="w-16 h-16 overflow-hidden rounded">
+                  <Image
+                    src={product.images[0]?.image || '/assets/noImage.jpg'}
+                    alt={product.name}
+                    width={50}
+                    height={50}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </TableCell>
               <TableCell className="text-center">
                 <div className="flex justify-center gap-2 items-center">

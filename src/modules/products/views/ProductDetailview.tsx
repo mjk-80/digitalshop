@@ -1,5 +1,7 @@
+import { Suspense } from 'react';
 import ProductForm from '../components/ProductForm';
 import { getProductById } from '../services';
+import Spinner from '@/components/Spinner';
 
 async function ProductDetailview(props: { id: string }) {
   const { id } = props;

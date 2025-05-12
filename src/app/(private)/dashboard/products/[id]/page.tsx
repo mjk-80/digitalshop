@@ -1,5 +1,7 @@
+import Spinner from '@/components/Spinner';
 import { getProductById } from '@/modules/products/services';
 import ProductDetailview from '@/modules/products/views/ProductDetailview';
+import { Suspense } from 'react';
 async function DashboarProductDetail({
   params,
 }: {
@@ -10,7 +12,10 @@ async function DashboarProductDetail({
 
   return (
     <div>
-      <ProductDetailview id={id} />
+      <p className="mb-10">Some other things...</p>
+      <Suspense fallback={<Spinner />}>
+        <ProductDetailview id={id} />
+      </Suspense>
     </div>
   );
 }

@@ -43,8 +43,8 @@ export default function RootLayout({
               <ShoppingBag />
             </div>
           </header>
-          <div className="px-20 mt-20 ">{children}</div>
-          <div className=" mx-auto flex justify-center">{ads}</div>
+          <div className="px-20 mt-20 mb-10">{children}</div>
+          <div className=" mx-auto flex justify-center mb-10">{ads}</div>
           <footer className="bg-black flex justify-center w-full text-sm text-white py-1.5">
             &copy; 2025 mohammad. All rights reserved.
           </footer>

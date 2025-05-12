@@ -2,6 +2,7 @@
 import { Product } from '@/generated/prisma';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
+import { resolve } from 'path';
 
 export const getProducts = async () => {
   const result = await prisma.product.findMany({ include: { images: true } });
@@ -16,6 +17,8 @@ export const getProductsAPI = async () => {
   return response;
 };
 export const getProductById = async (id: string) => {
+  // throw new Error('There is some errors in server');
+  await new Promise((resolve) => setTimeout(resolve, 4000));
   const result = await prisma.product.findUnique({
     where: { id },
     include: { images: true },
