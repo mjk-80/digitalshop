@@ -1,6 +1,7 @@
 'use server';
 import { Product } from '@/generated/prisma';
 import { prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { resolve } from 'path';
 
@@ -18,7 +19,7 @@ export const getProductsAPI = async () => {
 };
 export const getProductById = async (id: string) => {
   // throw new Error('There is some errors in server');
-  await new Promise((resolve) => setTimeout(resolve, 4000));
+  // await new Promise((resolve) => setTimeout(resolve, 4000));
   const result = await prisma.product.findUnique({
     where: { id },
     include: { images: true },
@@ -45,6 +46,8 @@ export const upsertProduct = async (product: Product) => {
       data: product,
     });
   }
+
+  // revalidatePath('/dashboard/products');
 
   return result;
 };

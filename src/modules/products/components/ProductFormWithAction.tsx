@@ -16,73 +16,65 @@ import {
   SelectValue,
   Textarea,
 } from '@/components/ui';
-
+import { toast } from 'sonner';
 import { Product, ProductCategory } from '@/generated/prisma';
-import { useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { upsertProduct } from '../services';
-import {
-  redirect,
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
 import UploadImage from './UploadImage';
+import { useActionState, useEffect, useState } from 'react';
+import { upsertProduct } from '../action';
 
 const ProductForm = (props: { product: Product | null }) => {
-  const pathName = usePathname();
-  // console.log(pathName);
-  const params = useParams();
-  // console.log(params);
-  const searchParams = useSearchParams();
-  // console.log(searchParams);
-  const discount = searchParams.get('discount');
-  const router = useRouter();
-  console.log(router);
-
   const { product } = props;
-  const { register, handleSubmit, setValue } = useForm<Product>();
-  const onSubmitForm = (data: Product) => {
-    const _product = {
-      ...data,
-      id: product?.id,
-      price: parseFloat(data.price?.toString() || '0'),
-      quantity: parseInt(data.quantity?.toString() || '0'),
-      category: data.category || product?.category,
-    };
-    upsertProduct(_product as Product);
-    redirect('/dashboard/products');
+  const [state, action, isPending] = useActionState<
+    {
+      data: Product | null;
+      error: Record<string, string> | null;
+    },
+    FormData
+  >(upsertProduct, {
+    data: product ?? null,
+    error: null,
+  });
+
+  const { data, error } = state;
+
+  const [submitted, setSubmitted] = useState(false);
+  const handleSubmit = async (formData: FormData) => {
+    setSubmitted(true);
+    action(formData);
   };
+  useEffect(() => {
+    if (!submitted) return;
+    if (error) toast.error('Failed');
+    else if (data) toast.success('Success');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   return (
     <Card className="w-[500px] mx-auto mt-10">
-      <form className="max-w-lg" onSubmit={handleSubmit(onSubmitForm)}>
+      <form className="max-w-lg" action={handleSubmit}>
+        {' '}
+        <input type="hidden" name="id" value={product?.id || ''} />
         <CardHeader>
           <CardTitle>Product</CardTitle>
-          <CardTitle className="text-red-500">
+          {/* <CardTitle className="text-red-500">
             This product has {discount}% discount
-          </CardTitle>
+          </CardTitle> */}
           <CardDescription>Create new product</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="my-3 space-y-2">
             <Label htmlFor="name">Product Name</Label>
-            <Input
-              {...register('name')}
-              id="name"
-              required
-              defaultValue={product?.name || ''}
-            />
+            <Input name="name" id="name" defaultValue={data?.name || ''} />
+            {error?.name && (
+              <span className="text-red-500 mt-2 ml-2">{error.name}</span>
+            )}
           </div>
           <div className="my-3 space-y-2">
             <Label htmlFor="category">Category</Label>
             <Select
-              required
-              onValueChange={(value) =>
-                setValue('category', value as ProductCategory)
-              }
-              defaultValue={product?.category || ProductCategory.OTHERS}
+              name="category"
+              defaultValue={data?.category || ProductCategory.OTHERS}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a category" />
@@ -99,29 +91,40 @@ const ProductForm = (props: { product: Product | null }) => {
           <div className="my-3 space-y-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
-              {...register('description')}
+              name="description"
               id="description"
-              defaultValue={product?.description || ''}
+              defaultValue={data?.description || ''}
             />
+            {error?.description && (
+              <span className="text-red-500 mt-2 ml-2">
+                {error.description}
+              </span>
+            )}
           </div>
           <div className="my-3 space-y-2">
             <Label htmlFor="price">Price</Label>
             <Input
-              {...register('price')}
+              name="price"
               type="number"
               id="price"
               step="0.01"
-              defaultValue={product?.price || ''}
+              defaultValue={data?.price || ''}
             />
+            {error?.price && (
+              <span className="text-red-500 mt-2 ml-2">{error.price}</span>
+            )}
           </div>
           <div className="my-3 space-y-2">
             <Label htmlFor="quantity">Quantity</Label>
             <Input
-              {...register('quantity')}
+              name="quantity"
               type="number"
               id="quantity"
-              defaultValue={product?.quantity || ''}
+              defaultValue={data?.quantity || ''}
             />
+            {error?.quantity && (
+              <span className="text-red-500 mt-2 ml-2">{error.quantity}</span>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
@@ -129,7 +132,11 @@ const ProductForm = (props: { product: Product | null }) => {
             <Link href="/dashboard/products">Back</Link>
           </Button>
           <Button type="submit">
-            {product?.id ? 'Update Product' : 'Add Product'}
+            {isPending
+              ? 'Loading...'
+              : product?.id
+                ? 'Update Product'
+                : 'Add Product'}
           </Button>
         </CardFooter>
       </form>

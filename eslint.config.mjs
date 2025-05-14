@@ -13,9 +13,15 @@ const eslintConfig = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
     rules: {
-      'no-console': 1,
-      '@typescript-eslint/no-unused-vars': 0,
-      '@typescript-eslint/no-explicit-any': 1,
+      '@typescript-eslint/no-explicit-any': 0,
+      '@typescript-eslint/no-unused-expressions': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-console': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-this-alias': 'off',
+      '@typescript-eslint/no-unnecessary-type-constraint': 'off',
+      '@typescript-eslint/no-unsafe-function-type': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
 ];

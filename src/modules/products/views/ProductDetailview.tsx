@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import ProductForm from '../components/ProductForm';
+import ProductForm from '../components/ProductFormWithAction';
 import { getProductById } from '../services';
 import Spinner from '@/components/Spinner';
 
