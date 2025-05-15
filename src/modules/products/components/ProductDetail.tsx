@@ -1,3 +1,4 @@
+'use client';
 import {
   Button,
   Card,
@@ -5,12 +6,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui';
+import { useCart } from '@/hooks/useCart';
 import { ProductsWithImages } from '@/types';
 import { ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function ProductDetail(product: ProductsWithImages) {
+  const { addToCartMutation } = useCart();
   return (
     <div className="container mx-auto py-10">
       <Card className="max-w-3xl mx-auto">
@@ -45,7 +48,11 @@ export default function ProductDetail(product: ProductsWithImages) {
               <p className="text-gray-600 line-clamp-1">
                 {product?.description || 'No Description Available'}
               </p>
-              <Button className="my-4">
+              <Button
+                onClick={() => addToCartMutation.mutate(product.id)}
+                className="my-4"
+              >
+                Add to cart
                 <ShoppingCart />
               </Button>
               <Button variant="secondary" asChild>
