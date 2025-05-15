@@ -8,9 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "prepare": "husky",
     "studio": "npx prisma studio",
-    "generate": "npx prisma generate",
+    "generate": "npx prisma generate --no-engine",
     "migrate": "npx prisma migrate dev",
     "prod": "npm run build & npm run start"
   },
